@@ -20,8 +20,20 @@ int main(){
   ios::sync_with_stdio( false );
   cin.tie( nullptr );
 #ifdef LOCAL
-  freopen("in", "r" , stdin);
+
 #endif
- 
+  char ch;
+  std::string buffer;
+  const std::string &pathfile="input/in1.rs";
+  std::fstream file(pathfile, std::fstream::in);
+
+  if (!file.is_open()){
+    cout << "Cannot open the file\n";
+    exit(0);
+  }
+  while (file >> std::noskipws >> ch){
+    cout <<ch;
+    //here should be called the core for the lexical analyser
+  }
   return 0;
 }
