@@ -1,3 +1,7 @@
+/*
+ * author: xdanielsb
+ * date: 29-11-2020
+ */
 #include <bits/stdc++.h>
 #define endl '\n'
 #define d(x) cout <<#x << " = " << x << ", ";
@@ -11,6 +15,9 @@
 #define endl '\n'
 #define all(x) x.begin(),x.end()
 
+
+#include "src/core.hpp"
+
 using namespace std;
 typedef long long ll;
 typedef pair<int, int> ii;
@@ -23,14 +30,15 @@ int main(){
 
 #endif
   char ch;
-  std::string buffer;
-  const std::string &pathfile="input/in1.rs";
-  std::fstream file(pathfile, std::fstream::in);
+  string buffer;
+  const string &pathfile="input/in1.rs";
+  fstream file(pathfile, std::fstream::in);
 
   if (!file.is_open()){
     cout << "Cannot open the file\n";
     exit(0);
   }
+
   while (file >> std::noskipws >> ch){
     cout <<ch;
     //here should be called the core for the lexical analyser
