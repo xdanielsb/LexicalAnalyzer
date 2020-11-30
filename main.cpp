@@ -1,6 +1,6 @@
 /*
  * author: xdanielsb
- * date: 29-11-2020
+ * date: 30-11-2020
  */
 #include <bits/stdc++.h>
 #define endl '\n'
@@ -27,7 +27,6 @@ bool openedQuote = 0;
 
 enum{iskeyword, isoperator, isconstant,isnew,isstring,isblock, isnumbers, isident };
 int ln = 1, last_id = -1;
-
 bool check( const string& buf){
   if(isKeyWord(buf)){
     cout<< " \n----LINE #"<< ln<< "  keyword: "<< buf << endl;
@@ -55,8 +54,11 @@ bool check( const string& buf){
     return true;
   }
   else{
-    if(buf.size()>0)// Not clasified yet
-      d0(buf);
+    if(buf.size()>0){
+      // Not clasified yet
+      cout<< " \n----LINE #"<< ln<< "  not classified "<< buf << endl;
+
+    }
   }
   return false;
 }

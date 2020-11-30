@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const vector<string> keywords{"mut", "let", "in", "fn", "std", "struct", "println!", "use", "return"};
+const vector<string> keywords{"mut", "let", "in", "fn", "std", "struct", "println!", "print!", "use", "return"};
 const vector<string> statements{"for", "while", "if", "else"};
 const vector<string> operators{"*", "<" ,">", "+", "-", "%", "/", "=", "-=", "*=", "+=", "/=", "++", "--", "==", "&", "|", "^"};
 
