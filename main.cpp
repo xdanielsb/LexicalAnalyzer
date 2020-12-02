@@ -63,18 +63,13 @@ bool check( const string& buf){
   return false;
 }
 
-int main(){
+int main( int argc, char** argv ){
   ios::sync_with_stdio( false );
   cin.tie( nullptr );
-#ifdef LOCAL
-
-#endif
   char ch;
-
   string buf="";
-
   stack<char> brack;
-  const string &pathfile="input/in2.rs";
+  const string &pathfile=argc<=1?"input/in1.rs":argv[1];
   fstream file(pathfile, std::fstream::in);
 
   if (!file.is_open()){

@@ -29,3 +29,7 @@ fn main() {
 ----LINE #4  string: "The number is even"
 ```
 
+#### Run
+```sh
+$ make path="path_to_rust_file"
+```
