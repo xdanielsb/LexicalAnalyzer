@@ -32,9 +32,9 @@ map< string, int> symbols;
 
 
 void error(const string &err){
-   cerr << err <<endl;
-   cout << "\t line:" << ln << endl; 
-   exit(0);
+  cerr << err <<endl;
+  cout << "\t line:" << ln << endl;
+  exit(0);
 }
 
 bool check( string& buf){
@@ -61,7 +61,7 @@ bool check( string& buf){
     if(last_id == isident)error("E05: you cannot have a string followed by an identifier");
     last_id = isstring;
     cout<< "----LINE #"<< ln<< "  string: "<< buf << endl;
-    symbols[buf] = isstring;    
+    symbols[buf] = isstring;
     return true;
   }
   if(isNumber(buf)){
@@ -70,7 +70,7 @@ bool check( string& buf){
     if(last_id == isnumbers)error("E09: you cannot have a number followed by a number");
     if(last_id == isident)error("E010: you cannot have a number followed by an identifier");
     last_id = isnumbers;
-    symbols[buf] = isnumbers;    
+    symbols[buf] = isnumbers;
     cout<< "----LINE #"<< ln<< "  number: "<< buf << endl;
     return true;
   }
@@ -79,15 +79,13 @@ bool check( string& buf){
     if(last_id == isstring)error("E12: you cannot have an id followed by a string");
     if(last_id == isnumbers)error("E14: you cannot have an id followed by a number");
     last_id = isident;
-    symbols[buf] = isident;    
+    symbols[buf] = isident;
     cout<< "----LINE #"<< ln<< "  identifier: "<< buf << endl;
     return true;
   }
   else{
     if(buf.size()>0){
-      // Not clasified yet
-      cout<< "----LINE #"<< ln<< "  not classified "<< buf << endl;
-
+      cout<< "----LINE #"<< ln<< "  not classified yet"<< buf << endl;
     }
   }
   return false;
@@ -150,7 +148,7 @@ int main( int argc, char** argv ){
       buf="";
     }else if ( ch == '}' || ch == ')'){
       if(brack.size() == 0|| brack.top()!= ch) {
-          error("E17: Malformed brackets");
+        error("E17: Malformed brackets");
       }
       tokens.push_back(string(1,ch));
       cout<< "----LINE #"<< ln<< "  scope: "<< ch << endl;
@@ -173,7 +171,7 @@ int main( int argc, char** argv ){
   }
   if( brack.size()) error("E16: Malformed brackets");
   if( isCommentBlock) error("E17: Malformed comments");
-    
+
   //tokens
   /* for( string s: tokens) d0(s); */
 
