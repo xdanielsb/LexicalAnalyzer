@@ -23,6 +23,7 @@ typedef vector<int> vi;
 bool isCommentLine = false;
 bool isCommentBlock = false;
 bool openedQuote = 0;
+bool errorFree = true;
 
 
 enum{iskeyword, isoperator, isconstant,isstring,isblock, isnumbers, isident };
@@ -34,23 +35,27 @@ map< string, int> symbols;
 void error(const string &err){
   cerr << err <<endl;
   cout << "\t line:" << ln << endl;
-  exit(0);
+  errorFree = false;
+}
+void report( int line, string type, string content){
+  #ifdef verbose
+    cout<< "----LINE #"<< line <<" " << type << " " << content << endl;
+  #endif
 }
 
 bool check( string& buf){
   if( buf.size() && buf.back() == '\n') buf.erase(buf.end());
   if(isKeyWord(buf)){
-    cout<< "----LINE #"<< ln<< "  keyword: "<< buf << endl;
+    report(ln,"keyword", buf);
     last_id = iskeyword;
     symbols[buf] = iskeyword;
     return true;
   }
   if(isOperator(buf)){
-    //(last_id == iskeyword || last_id == isconstant || last_id==isnumbers || last_id ==isident) &&
     if(last_id == iskeyword)error("E01: you cannot have a keyword followed by an operator");
     if(last_id == -1)error("E06: you need to have a number or identifier before an operator");
     last_id = isoperator;
-    cout<< "----LINE #"<< ln<< "  operator: "<< buf << endl;
+    report(ln, "operator", buf);
     symbols[buf] = isoperator;
     return true;
   }
@@ -60,7 +65,7 @@ bool check( string& buf){
     if(last_id == isnumbers)error("E04: you cannot have a string followed by a number");
     if(last_id == isident)error("E05: you cannot have a string followed by an identifier");
     last_id = isstring;
-    cout<< "----LINE #"<< ln<< "  string: "<< buf << endl;
+    report(ln,"string", buf);
     symbols[buf] = isstring;
     return true;
   }
@@ -71,7 +76,7 @@ bool check( string& buf){
     if(last_id == isident)error("E010: you cannot have a number followed by an identifier");
     last_id = isnumbers;
     symbols[buf] = isnumbers;
-    cout<< "----LINE #"<< ln<< "  number: "<< buf << endl;
+    report(ln, "number", buf);
     return true;
   }
   else if(isAlphaNum(buf)){
@@ -80,12 +85,12 @@ bool check( string& buf){
     if(last_id == isnumbers)error("E14: you cannot have an id followed by a number");
     last_id = isident;
     symbols[buf] = isident;
-    cout<< "----LINE #"<< ln<< "  identifier: "<< buf << endl;
+    report(ln,"identifier", buf);
     return true;
   }
   else{
     if(buf.size()>0){
-      cout<< "----LINE #"<< ln<< "  not classified yet"<< buf << endl;
+      report(ln,"not classified", buf);
     }
   }
   return false;
@@ -122,11 +127,11 @@ int main( int argc, char** argv ){
     if( isCommentLine || isCommentBlock){
       if(isCommentLine && ch =='\n'){
         isCommentLine = false;
-        cout<< "----LINE #"<< ln<< "  line-comment: "<< buf << endl;
+        report(ln, "line-comment", buf);
         buf="";
       }else if(isCommentBlock && buf.lst == '*' && ch == '/'){
         isCommentBlock = false;
-        cout<< "----LINE #"<< ln<< "  block-comment:\n"<< buf << "/" <<endl;
+        report(ln, "block-comment", buf);
         buf="";
       }else{
         buf+=ch;
@@ -143,7 +148,7 @@ int main( int argc, char** argv ){
     if( ch == '{' || ch == '('){
       tokens.push_back(string(1,ch));
       brack.push(ch=='{'?'}':')');
-      cout<< "----LINE #"<< ln<< "  scope: "<< ch << endl;
+      report(ln, "scope", string(1, ch));
       last_id= isblock;
       buf="";
     }else if ( ch == '}' || ch == ')'){
@@ -151,7 +156,7 @@ int main( int argc, char** argv ){
         error("E17: Malformed brackets");
       }
       tokens.push_back(string(1,ch));
-      cout<< "----LINE #"<< ln<< "  scope: "<< ch << endl;
+      report(ln, "scope", string(1, ch));
       buf="";
       brack.pop();
     }else if (ch == ';'){
@@ -171,6 +176,11 @@ int main( int argc, char** argv ){
   }
   if( brack.size()) error("E16: Malformed brackets");
   if( isCommentBlock) error("E17: Malformed comments");
+
+  if(errorFree)
+    cout << "Succesfull interpretation." <<endl;
+  else
+    cout << "Upps ... fix issues."<<endl;
 
   //tokens
   /* for( string s: tokens) d0(s); */
