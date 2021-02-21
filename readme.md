@@ -33,3 +33,13 @@ fn main() {
 ```sh
 $ make path="path_to_rust_file"
 ```
+
+#### verbose
+```sh
+$ make verbose="path_to_rust_file"
+```
+
+#### test
+```sh
+$ make test
+```
