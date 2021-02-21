@@ -1,7 +1,15 @@
 /*
- * author: xdanielsb
- * date: 30-11-2020
- */
+    Copyright (C) 2021  Daniel Santos @xdanielsb
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+*/
 #include <bits/stdc++.h>
 #define endl '\n'
 #define d(x) cout <<#x << " = " << x << ", ";
@@ -22,6 +30,7 @@ typedef vector<int> vi;
 
 bool isCommentLine = false;
 bool isCommentBlock = false;
+int  idFunction = 0;
 bool openedQuote = 0;
 bool errorFree = true;
 
@@ -30,7 +39,7 @@ enum{iskeyword, isoperator, isconstant,isstring,isblock, isnumbers, isident };
 int ln = 1, last_id = -1;
 vector < string > tokens;
 map< string, int> symbols;
-
+stack<char> brack;
 
 void error(const string &err){
   cerr << err <<endl;
@@ -38,9 +47,9 @@ void error(const string &err){
   errorFree = false;
 }
 void report( int line, string type, string content){
-  #ifdef verbose
-    cout<< "----LINE #"<< line <<" " << type << " " << content << endl;
-  #endif
+#ifdef verbose
+  cout<< "----LINE #"<< line <<" " << type << " " << content << endl;
+#endif
 }
 
 bool check( string& buf){
@@ -71,7 +80,6 @@ bool check( string& buf){
   }
   if(isNumber(buf)){
     if(last_id == isstring)error("E07: you cannot have a number followed by a string");
-    if(last_id == iskeyword)error("E08: you cannot have a number followed by a keyword");
     if(last_id == isnumbers)error("E09: you cannot have a number followed by a number");
     if(last_id == isident)error("E010: you cannot have a number followed by an identifier");
     last_id = isnumbers;
@@ -83,6 +91,13 @@ bool check( string& buf){
     if(last_id == isident)error("E011: you cannot have an identifier followed by an identifier");
     if(last_id == isstring)error("E12: you cannot have an id followed by a string");
     if(last_id == isnumbers)error("E14: you cannot have an id followed by a number");
+    if(tokens.back()=="fn"){
+      idFunction++;
+      if(brack.size()>0) error("E15: you cannot have a function inside a block.");
+      if(buf=="main"
+          && find(tokens.begin(), tokens.end(), "main") != tokens.end())
+        error("E08: the main in the application should be unique");
+    }
     last_id = isident;
     symbols[buf] = isident;
     report(ln,"identifier", buf);
@@ -102,7 +117,6 @@ int main( int argc, char** argv ){
   cin.tie( nullptr );
   char ch;
   string buf="";
-  stack<char> brack;
   const string &pathfile=argc<=1?"input/in1.rs":argv[1];
   fstream file(pathfile, std::fstream::in);
 
@@ -146,6 +160,8 @@ int main( int argc, char** argv ){
       }
     }
     if( ch == '{' || ch == '('){
+      if(buf.size()>0 && check(buf))
+        tokens.push_back(buf);
       tokens.push_back(string(1,ch));
       brack.push(ch=='{'?'}':')');
       report(ln, "scope", string(1, ch));
