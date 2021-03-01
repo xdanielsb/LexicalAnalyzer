@@ -34,12 +34,18 @@ fn main() {
 $ make path="path_to_rust_file"
 ```
 
-#### verbose
+#### Verbose - steps
 ```sh
-$ make verbose="path_to_rust_file"
+$ make verbose path="path_to_rust_file"
 ```
 
 #### test
 ```sh
-$ make test
+(base) daniel$ make test
+[doctest] doctest version is "2.4.1"
+[doctest] run with "--help" for options
+===============================================================================
+[doctest] test cases:  5 |  5 passed | 0 failed | 0 skipped
+[doctest] assertions: 20 | 20 passed | 0 failed |
+[doctest] Status: SUCCESS!
 ```

@@ -1,15 +1,15 @@
 /*
-    Copyright (C) 2021  Daniel Santos @xdanielsb
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+   Copyright (C) 2021  Daniel Santos @xdanielsb
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>
+   */
 #include <bits/stdc++.h>
 #define endl '\n'
 #define d(x) cout <<#x << " = " << x << ", ";
@@ -28,22 +28,24 @@ typedef long long ll;
 typedef pair<int, int> ii;
 typedef vector<int> vi;
 
-bool isCommentLine = false;
-bool isCommentBlock = false;
-int  idFunction = 0;
-bool openedQuote = 0;
-bool errorFree = true;
+bool isCommentLine;
+bool isCommentBlock ;
+int  idFunction  ;
+bool openedQuote  ;
+bool errorFree;
 
 
 enum{iskeyword, isoperator, isconstant,isstring,isblock, isnumbers, isident };
-int ln = 1, last_id = -1;
+int ln, last_id;
 vector < string > tokens;
 map< string, int> symbols;
 stack<char> brack;
 
 void error(const string &err){
+#ifndef TEST
   cerr << err <<endl;
   cout << "\t line:" << ln << endl;
+#endif
   errorFree = false;
 }
 void report( int line, string type, string content){
@@ -112,18 +114,25 @@ bool check( string& buf){
 }
 
 
-int main( int argc, char** argv ){
-  ios::sync_with_stdio( false );
-  cin.tie( nullptr );
+bool interpret(const string &pathfile){
+  isCommentLine = false;
+  isCommentBlock = false;
+  idFunction = 0;
+  openedQuote = 0;
+  errorFree = true;
+  ln = 1;
+  last_id = -1;
+  
+  tokens.clear();
+  symbols.clear();
+  while(!brack.empty())brack.pop();
+  fstream file(pathfile, fstream::in);
   char ch;
   string buf="";
-  const string &pathfile=argc<=1?"input/in1.rs":argv[1];
-  fstream file(pathfile, std::fstream::in);
-
   if (!file.is_open())
     error("E15: cannot open the file");
 
-  while (file >> std::noskipws >> ch){
+  while (file >> noskipws >> ch){
     if( ch == '\n') {
       ln++;
     }
@@ -174,7 +183,11 @@ int main( int argc, char** argv ){
       tokens.push_back(string(1,ch));
       report(ln, "scope", string(1, ch));
       buf="";
-      brack.pop();
+      if(brack.empty()){
+        errorFree=false;
+      }else{
+        brack.pop();
+      }
     }else if (ch == ';'){
       if(check(buf))
         tokens.push_back(buf);
@@ -197,11 +210,25 @@ int main( int argc, char** argv ){
     cout << "Succesfull interpretation." <<endl;
   else
     cout << "Upps ... fix issues."<<endl;
+  return errorFree;
+}
+
+#ifndef TEST
+
+int main( int argc, char** argv ){
+  ios::sync_with_stdio( false );
+  cin.tie( nullptr );
+
+  const string &pathfile=argc<=1?"input/in1.rs":argv[1];
+
 
   //tokens
   /* for( string s: tokens) d0(s); */
 
   //symbols
   /* for ( pair<string,int> f: symbols) d0(f.first); */
+
+  interpret(pathfile);
   return 0;
 }
+#endif

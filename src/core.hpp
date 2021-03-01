@@ -1,4 +1,6 @@
 #include<bits/stdc++.h>
+#ifndef _CDefines
+#define _CDefines
 using namespace std;
 
 const vector<string> keywords{"mut", "let", "in", "fn", "std", "struct", "println!", "print!", "use", "return"};
@@ -25,4 +27,4 @@ bool isAlphaNum(const string &str){
 bool isNumber( const string &str){
   return str.size()>0 && all_of(str.begin(), str.end(), ::isdigit);
 }
-
+#endif
