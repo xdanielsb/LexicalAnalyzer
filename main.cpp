@@ -39,6 +39,8 @@ enum{iskeyword, isoperator, isconstant,isstring,isblock, isnumbers, isident };
 int ln, last_id;
 vector < string > tokens;
 map< string, int> symbols;
+map< string, bool> ismut;
+map< string, bool> isused;
 stack<char> brack;
 
 void error(const string &err){
@@ -53,11 +55,23 @@ void report( int line, string type, string content){
   cout<< "----LINE #"<< line <<" " << type << " " << content << endl;
 #endif
 }
+void warning(string content, string extra){
+#ifdef verbose
+  cout<< "----Warning #" << content << ": " << extra << endl;
+#endif
+}
 
 bool check( string& buf){
   if( buf.size() && buf.back() == '\n') buf.erase(buf.end());
   if(isKeyWord(buf)){
     report(ln,"keyword", buf);
+    if(buf=="mut" && (tokens.empty() || tokens.back()!="let")){
+      error("E17: Wrong syntax mut should be followed by let ");
+    }
+    if(last_id==isoperator){
+      error("E17: You cannot have a key word followed by an operator.");
+    }
+    
     last_id = iskeyword;
     symbols[buf] = iskeyword;
     return true;
@@ -100,8 +114,22 @@ bool check( string& buf){
           && find(tokens.begin(), tokens.end(), "main") != tokens.end())
         error("E08: the main in the application should be unique");
     }
+    if(last_id != iskeyword && last_id != isoperator){
+      if( symbols[buf] != isident){
+        error("E16: The variable has not been declared");
+      }else if(!ismut[buf]){
+        error("E17: The variable is not mutable");
+      }else{
+        isused[buf] = true;
+      }
+    }
+    if(last_id == iskeyword && tokens.back()=="let" || tokens.back()=="mut"){
+      ismut[buf] = tokens.back()=="mut";
+      symbols[buf] = isident;
+      isused[buf] = false;
+    }
+      
     last_id = isident;
-    symbols[buf] = isident;
     report(ln,"identifier", buf);
     return true;
   }
@@ -125,6 +153,8 @@ bool interpret(const string &pathfile){
   
   tokens.clear();
   symbols.clear();
+  ismut.clear();
+  isused.clear();
   while(!brack.empty())brack.pop();
   fstream file(pathfile, fstream::in);
   char ch;
@@ -191,6 +221,9 @@ bool interpret(const string &pathfile){
     }else if (ch == ';'){
       if(check(buf))
         tokens.push_back(buf);
+      if(last_id==isoperator){
+        error("E17: You should have an element after an operator");
+      }
       last_id =-1;
       buf="";
     }else{
@@ -206,10 +239,15 @@ bool interpret(const string &pathfile){
   if( brack.size()) error("E16: Malformed brackets");
   if( isCommentBlock) error("E17: Malformed comments");
 
+  for ( pair<string,bool> f: isused){
+    if( !f.second) warning("variable is not used, name ", f.first);
+  }
+
   if(errorFree)
     cout << "Succesfull interpretation." <<endl;
   else
     cout << "Upps ... fix issues."<<endl;
+
   return errorFree;
 }
 
@@ -220,7 +258,6 @@ int main( int argc, char** argv ){
   cin.tie( nullptr );
 
   const string &pathfile=argc<=1?"input/in1.rs":argv[1];
-
 
   //tokens
   /* for( string s: tokens) d0(s); */
